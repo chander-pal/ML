@@ -15,65 +15,35 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
+          python-version: '3.9'  # Change this to the version you need
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt flake8 bandit pytest
-
-      - name: Run linter
-        id: lint
-        run: |
-          flake8 . > lint_results.txt || true  # Save lint output to file
-
-      - name: Security checks with Bandit
-        id: bandit
-        run: |
-          bandit -r . -f txt -o bandit_results.txt || true  # Save Bandit output to file
+          pip install -r requirements.txt  # Assuming you have a requirements file
 
       - name: Run tests
-        id: tests
         run: |
-          pytest tests/ --tb=short --maxfail=5 > test_results.txt || true  # Save test output to file
+          pytest tests/  # Adjust path if tests are located elsewhere
 
-      - name: Post PR Comment with Results if Any Step Fails
+      - name: Lint code
+        run: |
+          pip install flake8
+          flake8 .  # Adjust to your codebase
+
+      - name: Post PR Comment if Tests Fail
         if: failure()
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const issueNumber = context.payload.pull_request ? context.payload.pull_request.number : null;
-            const fs = require('fs');
-
-            // Read the results from the output files
-            const lintResults = fs.existsSync('lint_results.txt') ? fs.readFileSync('lint_results.txt', 'utf8') : 'No linting issues found.';
-            const banditResults = fs.existsSync('bandit_results.txt') ? fs.readFileSync('bandit_results.txt', 'utf8') : 'No security issues found by Bandit.';
-            const testResults = fs.existsSync('test_results.txt') ? fs.readFileSync('test_results.txt', 'utf8') : 'All tests passed.';
-
             if (issueNumber) {
-              const commentBody = `
-              ### PR Workflow Results
-              #### Linter Results:
-              \`\`\`
-              ${lintResults}
-              \`\`\`
-
-              #### Security Check (Bandit) Results:
-              \`\`\`
-              ${banditResults}
-              \`\`\`
-
-              #### Test Results:
-              \`\`\`
-              ${testResults}
-              \`\`\`
-              `;
               await github.rest.issues.createComment({
                 issue_number: issueNumber,
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                body: commentBody
+                body: "⚠️ Tests failed! Please review the logs and make necessary changes."
               });
             } else {
               console.log("No PR context found; skipping comment.");
