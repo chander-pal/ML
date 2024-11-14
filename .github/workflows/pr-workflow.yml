@@ -39,7 +39,7 @@ jobs:
           script: |
             const issueNumber = context.payload.pull_request ? context.payload.pull_request.number : null;
             if (issueNumber) {
-              github.issues.createComment({
+              await github.issues.createComment({
                 issue_number: issueNumber,
                 owner: context.repo.owner,
                 repo: context.repo.repo,
@@ -48,3 +48,4 @@ jobs:
             } else {
               console.log("No PR context found; skipping comment.");
             }
+
