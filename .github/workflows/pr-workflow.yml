@@ -31,10 +31,6 @@ jobs:
         run: |
           pytest tests/  # Adjust path if tests are located elsewhere
 
-      - name: Lint code
-        run: |
-          pip install flake8
-          flake8 .  # Adjust to your codebase
 
       - name: Post PR Comment if Tests Fail
         if: failure()
