@@ -1,0 +1,8 @@
+site_name: "Your Project Documentation"
+theme:
+  name: material
+nav:
+  - Home: index.md
+  - Guide: guide.md
+  - API Reference: api.md
+
