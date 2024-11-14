@@ -21,6 +21,11 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt  # Assuming you have a requirements file
+       
+      - name: Deploy to GitHub Pages
+        run: mkdocs gh-deploy --force
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run tests
         run: |
