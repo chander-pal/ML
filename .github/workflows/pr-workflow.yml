@@ -35,8 +35,16 @@ jobs:
         if: failure()
         uses: actions/github-script@v6
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            github.issues.createComment({
-              issue_number: context.issue.number,
-              body: "⚠️ Tests failed! Please review the logs and make necessary changes."
-            })
+            const issueNumber = context.payload.pull_request ? context.payload.pull_request.number : null;
+            if (issueNumber) {
+              github.issues.createComment({
+                issue_number: issueNumber,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: "⚠️ Tests failed! Please review the logs and make necessary changes."
+              });
+            } else {
+              console.log("No PR context found; skipping comment.");
+            }
