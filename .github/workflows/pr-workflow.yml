@@ -39,7 +39,7 @@ jobs:
           script: |
             const issueNumber = context.payload.pull_request ? context.payload.pull_request.number : null;
             if (issueNumber) {
-              await github.issues.createComment({
+              await github.rest.issues.createComment({
                 issue_number: issueNumber,
                 owner: context.repo.owner,
                 repo: context.repo.repo,
